@@ -12,6 +12,8 @@
     padding: 8px 10px;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: thin;
+    overscroll-behavior-inline: contain;
+    touch-action: pan-x;
 }
 
 .thumbnail-grid::-webkit-scrollbar {

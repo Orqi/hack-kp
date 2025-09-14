@@ -10,54 +10,41 @@ const Register = ({ setToken }) => {
     const navigate = useNavigate();
     const { theme } = useTheme();
 
-    const registerAndLogin = async (username, password) => {
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+        const username = e.target.username.value.trim();
+        const password = e.target.password.value;
+        if (!username || !password) {
+            setOutput('AUTH_FAIL :: Username and password required.');
+            return;
+        }
         setIsLoading(true);
-        setOutput('');
+        setOutput('Attempting registration...');
+
         try {
-           
             const registerResponse = await fetch(`${API_URL}/auth/register`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ username, password }),
             });
 
-            const registerData = await registerResponse.json();
+            const data = await registerResponse.json();
 
             if (!registerResponse.ok) {
-                throw new Error(registerData.message || 'Registration failed.');
+                throw new Error(data.message || 'Registration failed.');
             }
 
-            setOutput('Registration successful! Logging in...');
-
-        
-            const loginResponse = await fetch(`${API_URL}/auth/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password }),
-            });
-
-            const loginData = await loginResponse.json();
-
-            if (loginData.token) {
-                setToken(loginData.token);
-                setOutput('Login successful! Redirecting to Dashboard...');
-                setTimeout(() => navigate('/dashboard'), 1500);
-            } else {
-                throw new Error(loginData.message || 'Auto-login failed. Please log in manually.');
+            if (!data.token) {
+                throw new Error('No token returned. Please log in manually.');
             }
-        } catch (error) {
-            setOutput(`AUTH_FAIL :: ${error.message}`);
+
+            setToken(data.token);
+            setOutput('Registration successful! Redirecting to Dashboard...');
+            setTimeout(() => navigate('/dashboard'), 1500);
+        } catch (err) {
+            setOutput(`AUTH_FAIL :: ${err.message}`);
         } finally {
             setIsLoading(false);
-        }
-    };
-
-    const handleFormSubmit = (e) => {
-        e.preventDefault();
-        const username = e.target.username.value;
-        const password = e.target.password.value;
-        if (username && password) {
-            registerAndLogin(username, password);
         }
     };
 
@@ -67,40 +54,45 @@ const Register = ({ setToken }) => {
         script.async = true;
         script.onload = () => {
             if (window.particlesJS) {
-                window.particlesJS("particles-container", {
-                    "particles": {
-                        "number": { "value": 80, "density": { "enable": true, "value_area": 800 } },
-                        "color": { "value": "#ec1a6d" },
-                        "shape": { "type": "circle" },
-                        "opacity": { "value": 0.5, "random": false, "anim": { "enable": false } },
-                        "size": { "value": 3, "random": true, "anim": { "enable": false } },
-                        "line_linked": { "enable": true, "distance": 150, "color": "#ec1a6d", "opacity": 0.4, "width": 1 },
-                        "move": { "enable": true, "speed": 2, "direction": "none", "random": false, "straight": false, "out_mode": "out", "bounce": false }
+                window.particlesJS('particles-container', {
+                    particles: {
+                        number: { value: 80, density: { enable: true, value_area: 800 } },
+                        color: { value: '#ec1a6d' },
+                        shape: { type: 'circle' },
+                        opacity: { value: 0.5 },
+                        size: { value: 3, random: true },
+                        line_linked: { enable: true, distance: 150, color: '#ec1a6d', opacity: 0.4, width: 1 },
+                        move: { enable: true, speed: 2, out_mode: 'out' }
                     },
-                    "interactivity": {
-                        "detect_on": "canvas",
-                        "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": true, "mode": "push" }, "resize": true },
-                        "modes": { "repulse": { "distance": 100, "duration": 0.4 }, "push": { "particles_nb": 4 } }
+                    interactivity: {
+                        detect_on: 'canvas',
+                        events: {
+                            onhover: { enable: true, mode: 'repulse' },
+                            onclick: { enable: true, mode: 'push' },
+                            resize: true
+                        },
+                        modes: { repulse: { distance: 100, duration: 0.4 }, push: { particles_nb: 4 } }
                     },
-                    "retina_detect": true
+                    retina_detect: true
                 });
             }
         };
         document.body.appendChild(script);
-
         return () => {
             document.body.removeChild(script);
             const pjsCanvas = document.querySelector('.particles-js-canvas-el');
             if (pjsCanvas) pjsCanvas.remove();
-        }
+        };
     }, []);
 
     return (
         <>
             <link rel="preconnect" href="https://fonts.googleapis.com" />
             <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
-            <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Fira+Code&display=swap" rel="stylesheet" />
-
+            <link
+                href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Fira+Code&display=swap"
+                rel="stylesheet"
+            />
             <div className={`register-body-wrapper ${theme}`}>
                 <div id="particles-container"></div>
                 <div className="register-container">
@@ -118,6 +110,7 @@ const Register = ({ setToken }) => {
                                 placeholder="Username"
                                 required
                                 autoComplete="off"
+                                disabled={isLoading}
                             />
                             <input
                                 className="register-input"
@@ -126,16 +119,16 @@ const Register = ({ setToken }) => {
                                 placeholder="Password"
                                 required
                                 autoComplete="off"
+                                disabled={isLoading}
                             />
                             <button className="register-button" type="submit" disabled={isLoading}>
-                                {isLoading ? <div className="loader"></div> : 'Authenticate'}
+                                {isLoading ? <div className="loader"></div> : 'Register'}
                             </button>
                         </form>
                         <p className="login-link">
                             Have an account? <span onClick={() => navigate('/login')}>Login here</span>
                         </p>
                     </div>
-
                     {output && (
                         <pre className={`register-output ${output.startsWith('AUTH_FAIL') ? 'error' : ''}`}>
                             {`[SYSTEM_LOG]:~# ${output}`}

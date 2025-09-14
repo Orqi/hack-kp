@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './Profile.css';
 import { useTheme } from '../ThemeContext';
+import { useNavigate } from 'react-router-dom';
 
 const API_URL = 'http://localhost:3000';
 
 const Profile = ({ token }) => {
     const [output, setOutput] = useState('');
     const { theme } = useTheme();
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -65,6 +67,7 @@ const Profile = ({ token }) => {
                 <div id="particles-container"></div>
                 <div className="profile-container">
                     <div className="profile-card">
+                        <button className="back-button" onClick={() => navigate('/dashboard')}>← Back</button>
                         <h2 className="profile-title">Profile</h2>
                         <p className="profile-subtitle">User Information</p>
                         <pre className="profile-output">

@@ -59,6 +59,7 @@
     text-align: center;
     animation: fade-in-up 0.8s ease-out;
     clip-path: polygon(0% 15px, 15px 0%, 100% 0%, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0% 100%);
+    position: relative;
 }
 
 @keyframes fade-in-up {
@@ -95,6 +96,7 @@
     width: 100%;
     box-sizing: border-box;
 }
+
 .annotation-canvas {
     position: absolute;
     top: 0;
@@ -222,4 +224,36 @@
 
 .anno-list-item:last-child {
     border-bottom:none;
+}
+
+.back-button {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(236, 26, 109, 0.15);
+    color: #EC1A6D;
+    border: 1px solid #EC1A6D;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: background 0.2s ease, color 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
+    z-index: 40;
+}
+
+.back-button:hover {
+    background: #EC1A6D;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(236, 26, 109, 0.35);
+}
+
+.back-button:active {
+    transform: translateY(1px);
+}
+
+.back-button:focus {
+    outline: 2px solid #EC1A6D;
+    outline-offset: 2px;
 }
