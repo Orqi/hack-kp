@@ -1,5 +1,5 @@
 Name: Amrita Reji
-# task
+# Task
 👉 [Demo Video link](https://youtu.be/ds3tgF1-PUo?si=hlKK_E8HmkNp7Cw_)
 ## Tech Stack
 
